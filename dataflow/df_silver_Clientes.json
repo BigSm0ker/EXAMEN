@@ -36,6 +36,9 @@
 				},
 				{
 					"name": "derivedColumn4"
+				},
+				{
+					"name": "cast1"
 				}
 			],
 			"scriptLines": [
@@ -84,7 +87,16 @@
 				")) ~> derivedColumn3",
 				"derivedColumn3 derive(cst_firstname = iif(isNull(cst_firstname), 'Unknown', trim(cst_firstname)),",
 				"          cst_lastname = iif(isNull(cst_lastname), 'Unknown', trim(cst_lastname))) ~> derivedColumn4",
-				"derivedColumn4 sink(allowSchemaDrift: true,",
+				"derivedColumn4 cast(output(",
+				"          cst_id as long,",
+				"          cst_key as string,",
+				"          cst_firstname as string,",
+				"          cst_lastname as string,",
+				"          cst_marital_status as string,",
+				"          cst_gndr as string",
+				"     ),",
+				"     errors: true) ~> cast1",
+				"cast1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          cst_id as long,",
