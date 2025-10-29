@@ -1,0 +1,83 @@
+{
+	"name": "df_silver_Clientes_location",
+	"properties": {
+		"folder": {
+			"name": "SILVER"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_tablas_Clientes_location",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "sql_Clientes_location",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "cast1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          CID as string,",
+				"          CNTRY as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1",
+				"source1 derive(CNTRY = iif(\r",
+				"    isNull(CNTRY) || length(trim(CNTRY)) == 0,\r",
+				"    'Unknown',\r",
+				"    iif(\r",
+				"        equals(trim(CNTRY), 'US') || equals(trim(CNTRY), 'USA') || equals(trim(CNTRY), 'United States'), \r",
+				"        'United States', \r",
+				"        iif(\r",
+				"            equals(trim(CNTRY), 'DE') || equals(trim(CNTRY), 'Germany'), \r",
+				"            'Germany', \r",
+				"            trim(CNTRY)\r",
+				"        )\r",
+				"    )\r",
+				")) ~> derivedColumn1",
+				"derivedColumn1 cast(output(",
+				"          CID as string,",
+				"          CNTRY as string",
+				"     ),",
+				"     errors: true) ~> cast1",
+				"cast1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          CID as string,",
+				"          CNTRY as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          CID,",
+				"          CNTRY",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}
