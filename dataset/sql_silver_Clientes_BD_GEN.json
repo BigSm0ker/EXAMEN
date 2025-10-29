@@ -1,0 +1,32 @@
+{
+	"name": "sql_silver_Clientes_BD_GEN",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_sql_dw_ventas",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "SILVER"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "CID",
+				"type": "nvarchar"
+			},
+			{
+				"name": "BDATE",
+				"type": "date"
+			},
+			{
+				"name": "GEN",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "SILVER",
+			"table": "Clientes_BD_GEN_SILVER"
+		}
+	}
+}

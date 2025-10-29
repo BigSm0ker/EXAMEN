@@ -1,0 +1,87 @@
+{
+	"name": "df_silver_Clientes_BD_GEN",
+	"properties": {
+		"folder": {
+			"name": "SILVER"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_tabla_Clientes_BD_GEN",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "sql_silver_Clientes_BD_GEN",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "cast1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          CID as string,",
+				"          BDATE as string,",
+				"          GEN as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1",
+				"source1 derive(GEN = iif(\r",
+				"    equals(trim(GEN), 'M') || equals(trim(GEN), 'Male'),\r",
+				"    'Male',\r",
+				"    iif(\r",
+				"        equals(trim(GEN), 'F') || equals(trim(GEN), 'Female'),\r",
+				"        'Female',\r",
+				"        'Unknown'\r",
+				"    )\r",
+				")) ~> derivedColumn1",
+				"derivedColumn1 derive(BDATE = trim(BDATE)) ~> derivedColumn2",
+				"derivedColumn2 cast(output(",
+				"          CID as string,",
+				"          BDATE as date,",
+				"          GEN as string",
+				"     ),",
+				"     errors: true) ~> cast1",
+				"cast1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          CID as string,",
+				"          BDATE as date,",
+				"          GEN as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          CID,",
+				"          BDATE,",
+				"          GEN",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}
