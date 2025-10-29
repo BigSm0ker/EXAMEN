@@ -29,9 +29,6 @@
 					"name": "derivedColumn1"
 				},
 				{
-					"name": "derivedColumn2"
-				},
-				{
 					"name": "cast1"
 				},
 				{
@@ -57,14 +54,13 @@
 				"        'Unknown'\r",
 				"    )\r",
 				")) ~> derivedColumn1",
-				"derivedColumn1 derive(BDATE = trim(BDATE)) ~> derivedColumn2",
 				"derivedColumn3 cast(output(",
 				"          CID as string,",
 				"          BDATE as date,",
 				"          GEN as string",
 				"     ),",
 				"     errors: true) ~> cast1",
-				"derivedColumn2 derive(CID = iif(\r",
+				"derivedColumn1 derive(CID = iif(\r",
 				"    startsWith(CID, 'NASA'),\r",
 				"    trim(replace(CID, 'NASA', '')),\r",
 				"    trim(CID)\r",
